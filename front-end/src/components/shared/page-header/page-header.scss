@@ -1,0 +1,17 @@
+.page-header {
+	display: flex;
+	justify-content: space-between;
+    align-items: center;
+	padding: 1rem;
+	padding-right: 0;
+
+	.title {
+		font-size: 1.2rem;
+		font-weight: bold;
+	}
+
+	.buttons-set {
+        display: flex;
+        column-gap: 1rem;
+	}
+}

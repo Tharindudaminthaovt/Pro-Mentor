@@ -1,0 +1,39 @@
+.create-event-page {
+	.cont {
+		width: 80%;
+		margin: 0 auto;
+	}
+	.form {
+		display: flex;
+		flex-direction: column;
+		row-gap: 1rem;
+
+		.uploaded-image {
+			width: 70%;
+			margin: 1rem auto;
+		}
+
+		button.btn.btn-primary {
+			margin-bottom: 2rem;
+		}
+	}
+
+	.one-row {
+		display: flex;
+		justify-content: space-between;
+		margin: 0.5rem 0;
+
+		.date-time {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.filter {
+			width: 45%;
+		}
+	}
+
+	// .form-label {
+	// 	margin-top: 0.3rem;
+	// }
+}

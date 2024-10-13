@@ -1,0 +1,22 @@
+.custom-table {
+	margin: 1rem 0;
+	background: var(--grey-white);
+	padding: 0.75rem 0.5rem;
+	border-radius: 1rem;
+	font-size: 0.8rem;
+
+	-webkit-box-shadow: 4px 4px 24px -11px rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 4px 4px 24px -11px rgba(0, 0, 0, 0.75);
+	box-shadow: 4px 4px 24px -11px rgba(0, 0, 0, 0.75);
+
+	.select-all-row {
+		display: flex;
+		justify-content: space-between;
+		padding: 0.7rem;
+		// background: var(--light-blue);
+	}
+
+	tr > td{
+		margin: 0.5rem 0 !important;
+	}
+}

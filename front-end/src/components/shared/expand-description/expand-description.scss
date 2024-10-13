@@ -1,0 +1,25 @@
+.description {
+    position: relative;
+}
+
+.text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Number of lines to display */
+    overflow: hidden;
+    font-size: 0.8rem;
+}
+
+.text.expanded {
+    -webkit-line-clamp: unset; /* Display all lines when expanded */
+}
+
+.see-more-btn {
+    position: absolute;
+    bottom: -20px;
+    right: 0;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-style: italic;
+}

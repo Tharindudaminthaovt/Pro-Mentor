@@ -1,0 +1,32 @@
+.login-logo {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 2rem;
+
+	img {
+		width: 7rem;
+	}
+}
+
+form.login-form {
+	margin-top: 2rem;
+}
+
+form {
+	.pswd {
+		margin-top: 1rem;
+		margin-bottom: 3rem;
+	}
+}
+
+.login-form {
+	.login-btn {
+		width: 10rem;
+	}
+
+	.btn-cont {
+		display: flex;
+		justify-content: center;
+	}
+}

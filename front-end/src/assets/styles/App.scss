@@ -1,0 +1,75 @@
+@import 'bootstrap/scss/bootstrap';
+
+@import 'react-bootstrap-sidebar-menu/dist/sidebar-menu.scss';
+@import './custom.scss';
+
+.main-wrapper {
+	width: 100vw;
+	height: 100vh;
+	background: #f3f4f6;
+	position: relative;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto 1fr;
+	grid-template-areas:
+		'sidebar header'
+		'sidebar main';
+}
+
+.main-header {
+	grid-area: header;
+	padding: 0.5rem;
+}
+
+.main-container {
+	grid-area: main;
+	box-shadow: inset 2px 1px 9px 1px rgba($dark, 0.1);
+	overflow: auto;
+	padding: 0.5rem;
+}
+
+.page {
+	height: 100%;
+}
+
+.disabled-div {
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+.enabled-div {
+	pointer-events: visible;
+	opacity: 1;
+}
+
+.react-datepicker__input-container input {
+	padding: 0.375rem 0.75rem;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--bs-body-color);
+	appearance: none;
+	background-color: var(--bs-body-bg);
+	background-clip: padding-box;
+	border: var(--bs-border-width) solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	transition:
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
+}
+
+.react-dropdown-select {
+	padding: 0.375rem 0.75rem;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--bs-body-color);
+	appearance: none;
+	background-color: var(--bs-body-bg);
+	background-clip: padding-box;
+	border: var(--bs-border-width) solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	transition:
+		border-color 0.15s ease-in-out,
+		box-shadow 0.15s ease-in-out;
+}

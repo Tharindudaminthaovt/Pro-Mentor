@@ -1,0 +1,22 @@
+.create-job-page {
+	.cont {
+		width: 80%;
+		margin: 0 auto;
+
+		.filters {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			padding: 1rem 0;
+
+			.filter {
+				width: 32%;
+				max-width: 32%;
+			}
+		}
+
+		.tags-filter {
+			padding-bottom: 1rem;
+		}
+	}
+}

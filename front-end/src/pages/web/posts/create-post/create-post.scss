@@ -1,0 +1,16 @@
+.create-post-page {
+	.cont {
+		width: 80%;
+		margin: 0 auto;
+	}
+	.form {
+		display: flex;
+		flex-direction: column;
+		row-gap: 1rem;
+
+		.uploaded-image {
+			width: 70%;
+			margin: 1rem auto;
+		}
+	}
+}
