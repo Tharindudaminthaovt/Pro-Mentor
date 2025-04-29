@@ -10,11 +10,10 @@ type Props = {
 }
 
 function JobsItem({ item, setSelectedJob }: Props) {
-	// console.log(item)
 
 	return (
 		<Card
-			className="job-item"
+			className="job-item mb-2"
 			onClick={() => (setSelectedJob ? setSelectedJob(item) : undefined)}
 		>
 			<div className="company-logo">

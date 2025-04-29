@@ -27,6 +27,9 @@ import DotsToggle from '../../../shared/dots-toggle/dots-toggle'
 import { useNavigate } from 'react-router-dom'
 import { useDeletePost } from '../../../../hooks/web/posts/useDeletePost'
 import PostDelete from '../post-delete/post-delete'
+import { Box } from '@mui/material'
+import { FiMessageSquare } from 'react-icons/fi'
+import { generateAvatarImage } from '../../../../utils/profileAvatarGenerator'
 
 type Props = {
 	postItem: GetPostsListResponse
@@ -38,18 +41,22 @@ const sessionHandler = new SessionHandler()
 function PostItem({ postItem, mutateList }: Props) {
 	const [post, setPost] = useState(postItem)
 	const navigate = useNavigate()
-	const fullName =
-		post?.owner !== null
-			? `${post?.owner?.firstName} ${post?.owner?.lastName}`
+	// const fullName =
+	// 	post?.owner !== null
+	// 		? `${post?.owner?.firstName} ${post?.owner?.lastName}`
+	// 		: 'Unknown User'
+	const displayName =
+		post?.createdBy !== null || post?.createdBy !== undefined
+			? post?.createdBy
 			: 'Unknown User'
-
+	const avartarImage = generateAvatarImage(post?.createdBy)
 	const { register, handleSubmit, reset } = useForm<{ comment: string }>()
 	const [liked, setLiked] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [showComments, setShowComments] = useState(false)
+	const [addComment, setAddComment] = useState(false)
 	const [isOwner, setIsOwner] = useState(false)
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-
 	const {
 		getCommentsResponse,
 		isLoading_getComments,
@@ -129,6 +136,7 @@ function PostItem({ postItem, mutateList }: Props) {
 		setShowComments(!showComments)
 		setPostId_getComments(post.id)
 		mutate_getComments()
+		addComment ? setAddComment(false) : setAddComment(true)
 	}
 
 	const postDeleteHandler = () => {
@@ -163,7 +171,6 @@ function PostItem({ postItem, mutateList }: Props) {
 		setIsOwner(checkPermission())
 		// mutate_getComments()
 	}, [])
-
 	// useEffect(() => {
 	// 	if (getCommentsResponse && getCommentsResponse.length > 0) {
 	// 		console.log(getCommentsResponse)
@@ -245,19 +252,27 @@ function PostItem({ postItem, mutateList }: Props) {
 
 	return (
 		<>
-			<div className="card-parent">
+			<div className="card-parent" style={{ margin: '30px' }}>
 				{post && (
 					<Card className="post-item-container">
 						<div className="top-row">
 							<div className="d-flexss">
 								<Avatar
-									name={fullName}
+									// name={fullName}
+									name={displayName}
 									className="rounded-circle avatar"
 									size="35"
+									src={avartarImage}
 								/>
 
 								<div className="name-and-time">
-									<div className="">{fullName}</div>
+									{/* <div className="">{fullName}</div> */}
+									<div className="">
+										{displayName === 'lecturer1'
+											? 'Jeniffer Fernando'
+											: displayName}
+									</div>
+									{/* <div className="time-ago">Lecturer || Software Engineer</div> */}
 									<div className="time-ago">{timeAgo(post.createdAt)}</div>
 								</div>
 							</div>
@@ -278,16 +293,18 @@ function PostItem({ postItem, mutateList }: Props) {
 							)}
 						</div>
 
-						<div className="description-container">
+						{/* <div className="description-container"> */}
+						<pre className="description-container">
 							<ExpandDescription text={post.description} />
-						</div>
-
-						<Card.Img src={post.imageUrl} />
-
+						</pre>
+						{/* </div> */}
+						<Box>
+							<Card.Img src={post.imageUrl} height="550px" width="500px" />
+						</Box>
 						<div className="footer">
 							<div className="like-container">
 								<FontAwesomeIcon
-									style={{ color: '#35314e' }}
+									style={{ color: liked ? 'red' : '#35314e' }}
 									icon={liked ? solidHeart : outlineHeart}
 									fontSize={25}
 									className="like-btn"
@@ -295,34 +312,52 @@ function PostItem({ postItem, mutateList }: Props) {
 								/>
 								<div className="likes-count">{post.numberOfLikes}</div>
 							</div>
-
-							<Form onSubmit={handleSubmit(addCommentHandler)}>
-								<InputGroup className="comment-line">
-									<Form.Control
-										placeholder="Add a comment"
-										aria-label="Add a comment"
-										{...register('comment')}
-										onKeyDown={keyDownHandler} // Listen for Enter key press
-									/>
-									<InputGroup.Text id="basic-addon2">
-										<FontAwesomeIcon
-											icon={faComment}
-											style={{ color: '#35314e' }}
+							{addComment && (
+								<Form onSubmit={handleSubmit(addCommentHandler)}>
+									<InputGroup className="comment-line">
+										<Form.Control
+											placeholder="Add a comment"
+											aria-label="Add a comment"
+											{...register('comment')}
+											onKeyDown={keyDownHandler} // Listen for Enter key press
 										/>
-									</InputGroup.Text>
-								</InputGroup>
-							</Form>
-
+										<InputGroup.Text id="basic-addon2">
+											<FontAwesomeIcon
+												icon={faComment}
+												style={{ color: '#35314e' }}
+											/>
+										</InputGroup.Text>
+									</InputGroup>
+								</Form>
+							)}{' '}
 							<div
 								className="comments-btn"
+								style={{ fontSize: '14px' }}
 								onClick={commentSectionDisplayHandler}
 							>
-								<FontAwesomeIcon
+								{/* <FontAwesomeIcon
 									icon={faComments}
 									className="px-2"
 									style={{ color: '#35314e' }}
 									fontSize={18}
+								/> */}
+								<FiMessageSquare
+									// icon={faComments}
+									// className="px-2"
+									style={{
+										color: '#35314e',
+										marginRight: '3px',
+										fontSize: '16px',
+									}}
+									fontSize={18}
 								/>
+								<span style={{ marginRight: '5px' }}>
+									{getCommentsResponse?.length &&
+									getCommentsResponse?.length > 0
+										? getCommentsResponse?.length
+										: ''}
+								</span>
+								Comment
 							</div>
 						</div>
 
@@ -337,22 +372,34 @@ function PostItem({ postItem, mutateList }: Props) {
 							getCommentsResponse.length > 0 && (
 								<div className="comments">
 									{getCommentsResponse.map((comment) => {
-										const fullName =
-											comment?.firstName && comment?.lastName
-												? `${comment?.firstName} ${comment?.lastName}`
-												: 'Unknown User'
+										// const fullName =
+										// 	comment?.firstName && comment?.lastName
+										// 		? `${comment?.firstName} ${comment?.lastName}`
+										// 		: 'Unknown User'
+										const displayName =
+											comment?.username !== null ||
+											comment?.username !== undefined
+												? comment?.username
+												: 'Unknown  User'
 										return (
 											<>
 												<div className="top-row" key={comment.id}>
 													<Avatar
-														name={fullName}
+														// name={fullName}
+														name={displayName}
 														className="rounded-circle avatar"
 														size="35"
+														src={generateAvatarImage(displayName)}
 													/>
 
 													<div className="comment-container">
 														<div className="name-and-time">
-															<div className="fullname">{fullName}</div>
+															{/* <div className="fullname">{fullName}</div> */}
+															<div className="fullname">
+																{displayName === 'lecturer1'
+																	? 'Jeniffer Fernando'
+																	: displayName}
+															</div>
 															<div className="time-ago">
 																{timeAgo(comment.createdAt)}
 															</div>

@@ -6,6 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import './selected-chat-item.scss'
 import { Controller, useForm } from 'react-hook-form'
 import { useMessageCreate } from '../../../../hooks/web/chats/useMessageCreate'
+import { generateAvatarImage } from '../../../../utils/profileAvatarGenerator'
 
 const schema = yup.object().shape({
 	message: yup.string().required('message is required'),
@@ -43,6 +44,7 @@ const SelectedChatItem = ({
 	})
 
 	const { setMessage } = useMessageCreate()
+	const avartarImage = generateAvatarImage(chatSelected?.username)
 
 	const onSubmit = (data: IMessage) => {
 		console.log(data)
@@ -56,7 +58,6 @@ const SelectedChatItem = ({
 		}
 		reset()
 	}
-
 	return (
 		<Card className="selected-chat">
 			<div className="selected-top-row">
@@ -65,6 +66,7 @@ const SelectedChatItem = ({
 						name={chatSelected.name}
 						className="rounded-circle avatar"
 						size="60"
+						src={avartarImage}
 					/>
 					<div className="title-section">
 						<div className="title">{chatSelected.name}</div>
