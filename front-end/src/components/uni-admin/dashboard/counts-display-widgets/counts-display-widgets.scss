@@ -9,7 +9,8 @@
 		display: flex;
 		justify-content: space-between;
 		width: 15rem;
-		height: 7rem;
+		// height: 7rem;
+		height: 6rem;
 		background-color: var(--grey-blue);
 		color: var(--grey-white);
 		border-radius: 0.5rem;
@@ -17,7 +18,8 @@
 
 		.icon {
 			img {
-				width: 6rem;
+				// width: 6rem;
+				width: 5rem;
 			}
 		}
 		.text {

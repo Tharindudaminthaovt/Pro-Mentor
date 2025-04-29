@@ -68,7 +68,8 @@ function JobsDetailItem({ jobDetails }: Props) {
 					))}
 			</div>
 
-			<div className="description-section">{jobDetails.description}</div>
+			{/* <div className="description-section">{jobDetails.description}</div> */}
+			<pre>{jobDetails.description}</pre>
 		</Card>
 	)
 }

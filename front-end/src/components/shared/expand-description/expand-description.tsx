@@ -38,7 +38,8 @@ const ExpandDescription = (props: Props) => {
 					style={{ transition: 'bottom 0.3s ease' }}
 					onClick={toggleExpansion}
 				>
-					{expanded ? '<<< See less' : 'See more >>>'}
+					{/* {expanded ? '<<< See less' : 'See more >>>'} */}
+					{expanded ? '... less' : '... more '}
 				</div>
 			)}
 		</div>
