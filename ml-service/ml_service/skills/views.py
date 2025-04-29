@@ -157,17 +157,25 @@ def request_path(request):
     
     if request.method == 'POST':
         data = JSONParser().parse(request)
+        print(">>>> data >>>",data)
         skills = data.get('skills')
+        print(">>>> skills >>>>",skills)
         preprocessed_skills = TextPreprocessor.preprocess_text(skills)
+        print(">>>>> preprocessed_skills >>>",preprocessed_skills)
         sentence_trans = cv.transform([preprocessed_skills])
+        print(">>>> sentence_trans >>>",sentence_trans)
         prediction = model.predict(sentence_trans)
+        print(">>>>> prediction >>>",prediction)
 
         job = Job.objects.filter(value = prediction[0])
-
+        print(">>>>> job >>>",job)
         serializer = JobSerializer(job, many=True)
+        print(">>>>> serializer >>>>",serializer)
         guides = serializer.data[0]['job']
+        print(">>>>> guides >>>",guides)
 
         skillList = skills.split(',') if skills else []
+        print(">>>>> skillList >>>>",skillList)
 
         careerGuide = []
 
