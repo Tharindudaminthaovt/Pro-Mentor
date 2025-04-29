@@ -86,6 +86,19 @@ const LoginComponent = () => {
 						role === 'student' ||
 						role === 'user'
 				)
+			// const userRoleInSessonStorage: string = JSON.parse(
+			// 	sessionStorage.getItem('username')
+			// )
+			// if (userRoleInSessonStorage === userRole) {
+			// 	return
+			// }
+			// if (userRoleInSessonStorage !== userRole) {
+			// 	sessionHandler.destroySession('username')
+			// 	sessionHandler.saveSession(
+			// 		'username',
+			// 		loginResponse?.clientData?.username || usernameOrEmail
+			// 	)
+			// }
 
 			setupLoggedInUser(userRole || null)
 			setupToken(loginResponse?.access_token || null)

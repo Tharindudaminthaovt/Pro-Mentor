@@ -1,3 +1,48 @@
 .accordion .collapse:not(.show) {
     display: none !important;
 }
+.career-guide-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    
+    .skill-checkboxes {
+      .form-check {
+        padding-left: 2em;
+        
+        .form-check-input {
+          width: 1.2em;
+          height: 1.2em;
+          margin-left: -2em;
+        }
+        
+        .form-check-label {
+          font-size: 1rem;
+        }
+      }
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1050;
+    }
+    
+    .accordion-button {
+      &:not(.collapsed) {
+        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        color: var(--bs-primary);
+      }
+      
+      &::after {
+        background-size: 1.2rem;
+      }
+    }
+  }

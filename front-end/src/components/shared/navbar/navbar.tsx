@@ -51,6 +51,16 @@ const NavbarLocal = () => {
 			title: 'Lecturers',
 			path: '/lecturers',
 		},
+		{
+			id: 5,
+			title: 'Events',
+			path: '/admin-events',
+		},
+		{
+			id: 6,
+			title: 'Jobs',
+			path: '/admin-jobs',
+		},
 	]
 
 	const webNavList: NavItemType[] = [
@@ -74,11 +84,11 @@ const NavbarLocal = () => {
 			title: 'Chats',
 			path: '/chats',
 		},
-		// {
-		// 	id: 55,
-		// 	title: 'Profile',
-		// 	path: '/profile',
-		// },
+		{
+			id: 55,
+			title: 'Profile',
+			path: '/profile',
+		},
 	]
 
 	function navIconSetter(id: number) {
@@ -91,6 +101,10 @@ const NavbarLocal = () => {
 				return NStudents
 			case 4:
 				return NLecturers
+			case 5:
+				return NEvents
+			case 6:
+				return NJobs
 			case 22:
 				return NJobs
 			case 33:
@@ -251,7 +265,7 @@ const NavbarLocal = () => {
 							</Sidebar.Nav.Link>
 						</Sidebar.Nav>
 					</div>
-					<div className="powered-by-title">Powered by ProMentor © 2023</div>
+					<div className="powered-by-title">Powered by ProMentor © 2025</div>
 				</div>
 			</Sidebar.Collapse>
 		</Sidebar>
