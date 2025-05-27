@@ -8,12 +8,12 @@ Handling files for the app
 -   replace the required properties of the .env values
 
 ```
-HOST=sltc.app.promentor.local
+HOST=nsbm.app.promentor.local
 PORT=8083
 SERVICE_NAME=pro-mentor-cdn-service
 
 KEYCLOAK_CLIENT_ID=pro-mentor-cdn-service
-SLTC_CLIENT_SECRET=IVeD6oeAX7OEl4CZkznwiGikrbgCaEef
+NSBM_CLIENT_SECRET=IVeD6oeAX7OEl4CZkznwiGikrbgCaEef
 ```
 
 ### run service

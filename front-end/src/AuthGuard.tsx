@@ -11,7 +11,7 @@ const AuthGuard: React.FC<AuthGuardProps> = () => {
 		<StrictMode>
 			<div className="main-wrapper">
 				<NavbarLocal />
-				<main className="main-container container-fluid">
+				<main className="main-container container-fluid padding-2rem">
 					<Outlet />
 				</main>
 			</div>

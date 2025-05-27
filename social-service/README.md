@@ -2,7 +2,7 @@
 
 ## swagger url
 
-http://sltc.app.promentor.local:8084/api/v1/social/apis
+http://nsbm.app.promentor.local:8084/api/v1/social/apis
 
 
 ## Framework

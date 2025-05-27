@@ -33,8 +33,9 @@ const Profile = () => {
 	const [isEditing, setIsEditing] = useState(false)
 	const [editData, setEditData] = useState({}) // Added for edit functionality
 	const [posts, setPosts] = useState([])
+	const [eventList, setEventList] = useState([])
 
-	const eventList = useSelector((state: RootState) => state.events.eventList)
+	// const eventList = useSelector((state: RootState) => state.events.eventList)
 
 	const PROFILE_USER_NAME_FROM_SESSON =
 		sessionStorage.getItem('username') ||
@@ -59,7 +60,7 @@ const Profile = () => {
 			connections: 24, // Changed from followers/following to connections
 			events: [],
 		})
-	}, [PROFILE_USER_NAME, profile])
+	}, [PROFILE_USER_NAME, profile.bio, profile.name])
 
 	// Fetch posts
 	useEffect(() => {
@@ -68,13 +69,21 @@ const Profile = () => {
 	const fetchPostData = () => {
 		axios
 			.get(
-				'http://sltc.app.promentor.local:8084/api/v1/social/posts?page=0&size=1000'
+				'http://nsbm.app.promentor.local:8084/api/v1/social/posts?page=0&size=1000'
 			)
 			.then(function (response) {
 				setPosts(response?.data)
 			})
 			.catch(function (error) {
-				console.log(error)
+				console.log('error fetching posts in profile', error)
+			})
+		axios
+			.get('http://nsbm.app.promentor.local:8084/api/v1/social/events?')
+			.then(function (response) {
+				setEventList(response?.data)
+			})
+			.catch(function (error) {
+				console.log('error fetching events in profile', error)
 			})
 	}
 	// Handle edit input changes
@@ -134,6 +143,8 @@ const Profile = () => {
 		}
 		return []
 	}
+	console.log('>>>> POSTS BY ME >>>', postsCreatedByMe())
+	console.log('>>>> event list >>>', eventList)
 
 	return (
 		<div
@@ -515,6 +526,7 @@ const Profile = () => {
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
 						gap: '20px',
+						alignItems: 'stretch', // This makes cards in the same row equal height
 					}}
 				>
 					{eventsCreatedByMe().length > 0 ? (
@@ -526,13 +538,17 @@ const Profile = () => {
 									borderRadius: '12px',
 									overflow: 'hidden',
 									boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+									display: 'flex',
+									flexDirection: 'column',
+									height: '100%', // Ensures all cards take full height of grid cell
 								}}
 							>
 								<div
 									style={{
 										height: '120px',
-										// backgroundColor: '#e0e7ff',
 										backgroundImage: `url(${event.url})`,
+										backgroundSize: 'cover',
+										backgroundPosition: 'center',
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
@@ -543,7 +559,14 @@ const Profile = () => {
 								>
 									{!event?.url && <FiCalendar size={32} />}
 								</div>
-								<div style={{ padding: '20px' }}>
+								<div
+									style={{
+										padding: '20px',
+										flexGrow: 1, // Makes this section expand to fill available space
+										display: 'flex',
+										flexDirection: 'column',
+									}}
+								>
 									<h3 style={{ margin: '0 0 8px' }}>{event.title}</h3>
 									<div style={{ color: '#64748b', marginBottom: '8px' }}>
 										{new Date(event.time).toLocaleDateString('en-US', {
@@ -556,36 +579,40 @@ const Profile = () => {
 									<div style={{ color: '#64748b', marginBottom: '16px' }}>
 										{event.location.location}
 									</div>
-									<button
-										onClick={() => toggleEventAttendance(event.id)}
-										style={{
-											width: '100%',
-											padding: '8px',
-											backgroundColor: event.attending ? '#4f46e5' : 'white',
-											color: event.attending ? 'white' : '#4f46e5',
-											border: `1px solid ${
-												event.attending ? '#4f46e5' : '#c7d2fe'
-											}`,
-											borderRadius: '6px',
-											fontWeight: 600,
-											cursor: 'pointer',
-											transition: 'all 0.2s',
-										}}
-									>
-										{event.attending ? 'Attending ✓' : 'Attend Event'}
-									</button>
+									<div style={{ marginTop: 'auto' }}>
+										{' '}
+										{/* Pushes button to bottom */}
+										<button
+											onClick={() => toggleEventAttendance(event.id)}
+											style={{
+												width: '100%',
+												padding: '8px',
+												backgroundColor: event.attending ? '#4f46e5' : 'white',
+												color: event.attending ? 'white' : '#4f46e5',
+												border: `1px solid ${
+													event.attending ? '#4f46e5' : '#c7d2fe'
+												}`,
+												borderRadius: '6px',
+												fontWeight: 600,
+												cursor: 'pointer',
+												transition: 'all 0.2s',
+											}}
+										>
+											{event.attending ? 'Attending ✓' : 'Attend Event'}
+										</button>
+									</div>
 								</div>
 							</div>
 						))
 					) : (
 						<div
 							style={{
-								// backgroundColor: 'white',
 								backgroundColor: '#e0e7ff',
 								borderRadius: '12px',
 								padding: '40px',
 								textAlign: 'center',
 								boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
+								gridColumn: '1 / -1', // Makes the empty state span all columns
 							}}
 						>
 							<FiCalendar
@@ -593,7 +620,6 @@ const Profile = () => {
 								color="#cbd5e1"
 								style={{ marginBottom: '16px' }}
 							/>
-
 							<h3 style={{ marginBottom: '8px' }}>No events created yet</h3>
 							<p style={{ color: '#64748b', margin: 0 }}>
 								Create events to view them here later
@@ -602,7 +628,6 @@ const Profile = () => {
 					)}
 				</div>
 			)}
-
 			{/* Saved Section */}
 			{activeTab === 'saved' && (
 				<div

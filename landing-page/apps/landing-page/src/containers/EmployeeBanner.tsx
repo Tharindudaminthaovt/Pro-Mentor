@@ -76,7 +76,7 @@ export function EmployeeBanner() {
 						<Text mt={30}>
 							Are you passionate about sharing your industry expertise and helping shape the careers of aspiring professionals?
 							<br /><br />
-							Encourage your company to register on ProMentor and join our growing community of volunteer mentors. By becoming a mentor, you can make a meaningful impact on the lives of SLTC University students, offering guidance, advice, and support as they embark on their career journeys.
+							Encourage your company to register on ProMentor and join our growing community of volunteer mentors. By becoming a mentor, you can make a meaningful impact on the lives of NSBM University students, offering guidance, advice, and support as they embark on their career journeys.
 							<br /><br />
 							Together, let's bridge the gap between academia and industry.
 						</Text>

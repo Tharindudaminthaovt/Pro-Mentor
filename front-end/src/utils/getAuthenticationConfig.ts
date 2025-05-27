@@ -8,12 +8,12 @@ export function getAuthenticationConfig(
 	hostname: string,
 	protocol: string
 ): AuthenticationConfig {
-	if (hostname && hostname.includes('sltc-promentor')) {
+	if (hostname && hostname.includes('nsbm-promentor')) {
 		return {
 			idpUrl: `https://pro-mentor.live`,
 			clientId: import.meta.env.VITE_KEYCLOAK_CLIENT as string,
 			// clientId: 'pro-mentor-web-app',
-			realm: 'sltc',
+			realm: 'nsbm',
 		}
 	}
 

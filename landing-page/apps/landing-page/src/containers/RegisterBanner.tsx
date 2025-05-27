@@ -77,7 +77,7 @@ export function RegisterBanner() {
 						</Text>
 
 						<Text mt={30}>
-							Expand your reach and connect with top talent from SLTC Research University. Register your company on ProMentor and tap into a pool of motivated and skilled students eager to make their mark in the industry. Join our growing community and unlock new opportunities for collaboration and talent acquisition.
+							Expand your reach and connect with top talent from NSBM University. Register your company on ProMentor and tap into a pool of motivated and skilled students eager to make their mark in the industry. Join our growing community and unlock new opportunities for collaboration and talent acquisition.
 						</Text>
 					</Col>
 					<Col span={12} md={6} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
