@@ -30,6 +30,7 @@ import PostDelete from '../post-delete/post-delete'
 import { Box } from '@mui/material'
 import { FiMessageSquare } from 'react-icons/fi'
 import { generateAvatarImage } from '../../../../utils/profileAvatarGenerator'
+import axios from 'axios'
 
 type Props = {
 	postItem: GetPostsListResponse
@@ -249,7 +250,14 @@ function PostItem({ postItem, mutateList }: Props) {
 		error_getPost,
 		error_deletePost,
 	])
-
+	// console.log('>>>> POST >>>>', post.numberOfLikes)
+	// useEffect(() => {
+	// 	if (liked) {
+	// 		axios.put(
+	// 			`http://nsbm.app.promentor.local:8084/api/v1/social/posts/${post?.id}/like`
+	// 		)
+	// 	}
+	// }, [liked])
 	return (
 		<>
 			<div className="card-parent" style={{ margin: '30px' }}>

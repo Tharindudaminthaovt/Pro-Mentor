@@ -1,298 +1,4 @@
-// /* eslint-disable react-hooks/exhaustive-deps */
-// import { Button, Form, FormControl, Modal, Spinner } from 'react-bootstrap'
-// import PageHeader from '../../../components/shared/page-header/page-header'
-// import CustomTable from '../../../components/shared/custom-table/custom-table'
-// import { useEffect, useState } from 'react'
-// // import AddNewEvent from '../../../components/web/events/add-new-event/add-new-event'
-// // import DeactivateEvent, {
-// // 	DeactivateItem,
-// // } from '../../../components/web/events/deactivate-event/deactivate-event'
-// import { useCreateEvent } from '../../../hooks/web/web-events/useCreateEvent'
-// import { useGetEventList } from '../../../hooks/web/web-events/useGetEventList'
-// // import { useUpdateEvent } from '../../../hooks/web/web-events/useUpdateEvent'
-// import { GetEventResponse, EventCreateRequest } from '@promentor-app/shared-lib'
-// import { toast } from 'react-toastify'
-// import { errorDisplayHandler } from '../../../utils/errorDisplayHandler'
-// import { useForm } from 'react-hook-form'
-// import DeactivateLecturer from '../../../components/uni-admin/lecturers/deactivate-lecturer/deactivate-lecturer'
-// import RemoveEvent from '../../../components/uni-admin/admin-events/remove-event/remove-event'
-
-// type EventItem = {
-// 	id: string
-// 	title: string
-// 	description: string
-// 	location: string
-// 	mode: string
-// 	createdBy: string
-// 	companyName: string
-// }
-
-// const tableHeaders = [
-// 	'',
-// 	'Title',
-// 	'Description',
-// 	'Location',
-// 	'Mode',
-// 	'Created By',
-// 	'Company',
-// ]
-
-// const AdminEvents = () => {
-// 	const [isLoading, setIsLoading] = useState(false)
-// 	const [isAddNewModalOpen, setIsAddNewModalOpen] = useState(false)
-// 	const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false)
-// 	const [deactivateList, setDeactivateList] = useState<DeactivateItem[]>([])
-// 	const [eventsTableList, setEventsTableList] = useState<EventItem[]>([])
-// 	const [selectedEventList, setSelectedEventList] = useState<EventItem[]>([])
-// 	const { register, handleSubmit } = useForm<{ search: string }>()
-
-// 	const {
-// 		setCreateEventRequest,
-// 		createEventResponse,
-// 		isLoading_createEvent,
-// 		isValidating_createEvent,
-// 		error_createEvent,
-// 		setIsRequestReady_createEvent,
-// 	} = useCreateEvent()
-
-// 	const {
-// 		getEventsListResponse,
-// 		isLoading_getEvents,
-// 		isValidating_getEvents,
-// 		error_getEvents,
-// 		mutate_getEvents,
-// 		setSearch_getEvents,
-// 		setLocationId_getEvents,
-// 		setModeId_getEvents,
-// 	} = useGetEventList()
-
-// 	// const {
-// 	// 	setUpdateEventRequest,
-// 	// 	updateEventResponse,
-// 	// 	isLoading_updateEvent,
-// 	// 	isValidating_updateEvent,
-// 	// 	error_updateEvent,
-// 	// 	setEventId,
-// 	// 	setIsRequestReady_updateEvent,
-// 	// 	mutate_updateEvent,
-// 	// } = useUpdateEvent()
-
-// 	const searchHandler = (data: { search: string }) => {
-// 		if (data.search !== null && data.search !== undefined) {
-// 			setSearch_getEvents(data.search)
-// 			mutate_getEvents()
-// 		}
-// 	}
-
-// 	const keyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
-// 		if (event.key === 'Enter') handleSubmit(searchHandler)()
-// 	}
-
-// 	// open add new event modal
-// 	const addNewHandler = () => {
-// 		setIsAddNewModalOpen(true)
-// 	}
-
-// 	// open deactivate event modal
-// 	const deactivateHandler = () => {
-// 		deactivateListSetter(selectedEventList)
-// 		setIsDeactivateModalOpen(true)
-// 	}
-
-// 	// close both add and deactivate modals
-// 	const modalCloseHandler = () => {
-// 		setIsAddNewModalOpen(false)
-// 		setIsDeactivateModalOpen(false)
-// 	}
-
-// 	// add new event confirmed
-// 	const addNewConfirmHandler = (data: EventCreateRequest) => {
-// 		setCreateEventRequest(data)
-// 		setIsRequestReady_createEvent(true)
-// 	}
-
-// 	// deactivate event confirmed
-// 	// const deactivateConfirmHandler = (list: DeactivateItem[]) => {
-// 	// 	list.forEach((item) => {
-// 	// 		setEventId(item.id)
-// 	// 		setUpdateEventRequest({
-// 	// 			active: false,
-// 	// 		})
-// 	// 		setIsRequestReady_updateEvent(true)
-// 	// 		mutate_updateEvent()
-// 	// 	})
-
-// 	// 	setIsDeactivateModalOpen(false)
-// 	// }
-
-// 	// convert table row data into deactivate list data
-// 	const deactivateListSetter = (list: EventItem[]) => {
-// 		// const dList: DeactivateItem[] = list.map((item) => {
-// 		// 	return {
-// 		// 		id: item.id,
-// 		// 		name: item.title,
-// 		// 	}
-// 		// })
-// 		// setDeactivateList(dList)
-// 	}
-
-// 	// convert events details response into table row data
-// 	const eventsTableDataSetter = (response: GetEventResponse[]) => {
-// 		const evtList: EventItem[] = response.map((item) => {
-// 			return {
-// 				id: item.id,
-// 				title: item.title || '-',
-// 				description: item.description || '-',
-// 				location: item.location?.location || '-',
-// 				mode: item.mode?.key || '-',
-// 				createdBy: item.createdBy || '',
-// 				companyName: item.companyName || '',
-// 			}
-// 		})
-// 		setEventsTableList(evtList)
-// 	}
-
-// 	// select data row in the table
-// 	const selectHandler = (item: EventItem) => {
-// 		if (
-// 			selectedEventList.some((selectedEvent) => selectedEvent.id === item.id)
-// 		) {
-// 			// If already selected, remove from list
-// 			setSelectedEventList(
-// 				selectedEventList.filter(
-// 					(selectedEvent) => selectedEvent.id !== item.id
-// 				)
-// 			)
-// 		} else {
-// 			// If not selected, add to list
-// 			setSelectedEventList([...selectedEventList, item])
-// 		}
-// 	}
-
-// 	useEffect(() => {
-// 		mutate_getEvents()
-// 	}, [])
-
-// 	useEffect(() => {
-// 		if (createEventResponse) {
-// 			toast.success('Event created successfully.')
-// 			mutate_getEvents()
-// 			setIsAddNewModalOpen(false)
-// 		}
-// 	}, [createEventResponse])
-
-// 	useEffect(() => {
-// 		if (getEventsListResponse && getEventsListResponse.length > 0) {
-// 			eventsTableDataSetter(getEventsListResponse)
-// 		} else if (getEventsListResponse && getEventsListResponse.length === 0) {
-// 			setEventsTableList([])
-// 		}
-// 	}, [getEventsListResponse])
-
-// 	// useEffect(() => {
-// 	// 	if (updateEventResponse) {
-// 	// 		toast.info('Selected events deactivated successfully.')
-// 	// 		setSelectedEventList([])
-// 	// 		setDeactivateList([])
-// 	// 		mutate_getEvents()
-// 	// 	}
-// 	// }, [updateEventResponse])
-
-// 	useEffect(() => {
-// 		errorDisplayHandler(error_createEvent)
-// 		errorDisplayHandler(error_getEvents)
-// 		// errorDisplayHandler(error_updateEvent)
-// 	}, [error_createEvent, error_getEvents])
-
-// 	useEffect(() => {
-// 		if (
-// 			isLoading_createEvent ||
-// 			isLoading_getEvents ||
-// 			// isLoading_updateEvent ||
-// 			isValidating_createEvent ||
-// 			isValidating_getEvents
-// 			// ||
-// 			// isValidating_updateEvent
-// 		) {
-// 			setIsLoading(true)
-// 		} else {
-// 			setIsLoading(false)
-// 		}
-// 	}, [
-// 		isLoading_createEvent,
-// 		isLoading_getEvents,
-// 		// isLoading_updateEvent,
-// 		isValidating_createEvent,
-// 		isValidating_getEvents,
-// 		// isValidating_updateEvent,
-// 	])
-
-// 	return (
-// 		<>
-// 			<div className="page uni-events-page">
-// 				<PageHeader title="Events">
-// 					<>
-// 						<Form onSubmit={handleSubmit(searchHandler)}>
-// 							<FormControl
-// 								type="text"
-// 								placeholder="Search"
-// 								className="mr-sm-2"
-// 								{...register('search')}
-// 								onKeyDown={keyDownHandler}
-// 							/>
-// 						</Form>
-// 						<Button variant="primary" onClick={addNewHandler}>
-// 							Add New
-// 						</Button>
-// 						<Button
-// 							variant="primary"
-// 							onClick={deactivateHandler}
-// 							disabled={!(selectedEventList.length > 0)}
-// 						>
-// 							Remove
-// 						</Button>
-// 					</>
-// 				</PageHeader>
-// 				<div className="">
-// 					<CustomTable<EventItem>
-// 						tableHeaders={tableHeaders}
-// 						tableData={eventsTableList}
-// 						rowClickHandler={selectHandler}
-// 						selectedDataRows={selectedEventList}
-// 					/>
-// 				</div>
-// 			</div>
-
-// 			{/* add new modal */}
-// 			{/* <AddNewEvent
-// 				isAddNewModalOpen={isAddNewModalOpen}
-// 				modalCloseHandler={modalCloseHandler}
-// 				addNewConfirmHandler={addNewConfirmHandler}
-// 				isFormReset={createEventResponse ? true : false}
-// 			/> */}
-
-// 			{/* deactivate confirm modal */}
-// 			<RemoveEvent
-// 				isRemoveModalOpen={isDeactivateModalOpen}
-// 				modalCloseHandler={modalCloseHandler}
-// 				// deactivateConfirmHandler={deactivateConfirmHandler}
-// 				removeList={deactivateList}
-// 			/>
-
-// 			{/* Loader overlay */}
-// 			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-// 				<Modal.Body className="text-center">
-// 					<Spinner animation="border" role="status" />
-// 				</Modal.Body>
-// 			</Modal>
-// 		</>
-// 	)
-// }
-
-// export default AdminEvents
-
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Form, FormControl, Modal, Spinner } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PageHeader from '../../../components/shared/page-header/page-header'
 import CustomTable from '../../../components/shared/custom-table/custom-table'
 import { useEffect, useState } from 'react'
@@ -304,6 +10,7 @@ import { toast } from 'react-toastify'
 import { errorDisplayHandler } from '../../../utils/errorDisplayHandler'
 import { useForm } from 'react-hook-form'
 import RemoveEvent from '../../../components/uni-admin/admin-events/remove-event/remove-event'
+import { FiSearch, FiPlus, FiTrash2 } from 'react-icons/fi'
 
 type EventItem = {
 	id: string
@@ -336,6 +43,7 @@ const AdminEvents = () => {
 	const [selectedEventList, setSelectedEventList] = useState<EventItem[]>([])
 	const { register, handleSubmit } = useForm<{ search: string }>()
 
+	// Custom hooks for API calls
 	const {
 		setCreateEventRequest,
 		createEventResponse,
@@ -354,6 +62,82 @@ const AdminEvents = () => {
 		setSearch_getEvents,
 	} = useGetEventList()
 
+	// Styles
+	const styles = {
+		page: {
+			padding: '24px',
+			backgroundColor: '#f8f9fa',
+			minHeight: 'calc(100vh - 56px)',
+		},
+		headerContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			marginBottom: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		headerActions: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '16px',
+			width: '100%',
+		},
+		searchForm: {
+			flexGrow: 1,
+		},
+		searchInputContainer: {
+			position: 'relative',
+			display: 'flex',
+			alignItems: 'center',
+		},
+		searchIcon: {
+			position: 'absolute',
+			left: '12px',
+			color: '#6c757d',
+		},
+		searchInput: {
+			paddingLeft: '40px',
+			borderRadius: '8px',
+			border: '1px solid #e9ecef',
+			height: '40px',
+		},
+		actionButtons: {
+			display: 'flex',
+			gap: '12px',
+		},
+		actionButton: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '8px',
+			padding: '8px 16px',
+			borderRadius: '8px',
+			fontWeight: '500',
+		},
+		tableContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		loadingModal: {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		loadingContent: {
+			background: 'rgba(255, 255, 255, 0.9)',
+			border: 'none',
+			padding: '32px',
+			borderRadius: '12px',
+			textAlign: 'center' as const,
+		},
+		loadingText: {
+			marginTop: '16px',
+			color: '#111827',
+			fontWeight: '500',
+		},
+	}
+
 	const searchHandler = (data: { search: string }) => {
 		if (data.search !== null && data.search !== undefined) {
 			setSearch_getEvents(data.search)
@@ -365,32 +149,25 @@ const AdminEvents = () => {
 		if (event.key === 'Enter') handleSubmit(searchHandler)()
 	}
 
-	// open add new event modal
-	const addNewHandler = () => {
-		setIsAddNewModalOpen(true)
-	}
-
-	// open remove event modal
+	// Event handlers
+	const addNewHandler = () => setIsAddNewModalOpen(true)
 	const removeHandler = () => {
 		removeListSetter(selectedEventList)
 		setIsRemoveModalOpen(true)
 	}
 
-	// close both add and remove modals
 	const modalCloseHandler = () => {
 		setIsAddNewModalOpen(false)
 		setIsRemoveModalOpen(false)
 	}
 
-	// add new event confirmed
 	const addNewConfirmHandler = (data: EventCreateRequest) => {
 		setCreateEventRequest(data)
 		setIsRequestReady_createEvent(true)
 	}
 
-	// remove event confirmed
 	const removeConfirmHandler = (list: { id: string; name: string }[]) => {
-		// TODO: Implement event removal logic
+		// TODO: Implement actual removal logic
 		console.log('Events to remove:', list)
 		setIsRemoveModalOpen(false)
 		setSelectedEventList([])
@@ -398,21 +175,13 @@ const AdminEvents = () => {
 		mutate_getEvents()
 	}
 
-	// convert selected events into remove list
 	const removeListSetter = (list: EventItem[]) => {
-		const rList = list.map((item) => {
-			return {
-				id: item.id,
-				name: item.title,
-			}
-		})
-		setRemoveList(rList)
+		setRemoveList(list.map((item) => ({ id: item.id, name: item.title })))
 	}
 
-	// convert events details response into table row data
 	const eventsTableDataSetter = (response: GetEventResponse[]) => {
-		const eventList: EventItem[] = response.map((item) => {
-			return {
+		setEventsTableList(
+			response.map((item) => ({
 				id: item.id,
 				title: item.title || '-',
 				description: item.description || '-',
@@ -420,22 +189,19 @@ const AdminEvents = () => {
 				mode: item.mode?.key || '-',
 				createdBy: item.createdBy || '',
 				companyName: item.companyName || '',
-			}
-		})
-		setEventsTableList(eventList)
+			}))
+		)
 	}
 
-	// select data row in the table
 	const selectHandler = (item: EventItem) => {
-		if (selectedEventList.some((selected) => selected.id === item.id)) {
-			setSelectedEventList(
-				selectedEventList.filter((selected) => selected.id !== item.id)
-			)
-		} else {
-			setSelectedEventList([...selectedEventList, item])
-		}
+		setSelectedEventList((prev) =>
+			prev.some((selected) => selected.id === item.id)
+				? prev.filter((selected) => selected.id !== item.id)
+				: [...prev, item]
+		)
 	}
 
+	// Effects
 	useEffect(() => {
 		mutate_getEvents()
 	}, [])
@@ -449,10 +215,8 @@ const AdminEvents = () => {
 	}, [createEventResponse])
 
 	useEffect(() => {
-		if (getEventsListResponse && getEventsListResponse.length > 0) {
+		if (getEventsListResponse) {
 			eventsTableDataSetter(getEventsListResponse)
-		} else if (getEventsListResponse && getEventsListResponse.length === 0) {
-			setEventsTableList([])
 		}
 	}, [getEventsListResponse])
 
@@ -462,16 +226,12 @@ const AdminEvents = () => {
 	}, [error_createEvent, error_getEvents])
 
 	useEffect(() => {
-		if (
+		setIsLoading(
 			isLoading_createEvent ||
-			isLoading_getEvents ||
-			isValidating_createEvent ||
-			isValidating_getEvents
-		) {
-			setIsLoading(true)
-		} else {
-			setIsLoading(false)
-		}
+				isLoading_getEvents ||
+				isValidating_createEvent ||
+				isValidating_getEvents
+		)
 	}, [
 		isLoading_createEvent,
 		isLoading_getEvents,
@@ -480,50 +240,66 @@ const AdminEvents = () => {
 	])
 
 	return (
-		<>
-			<div className="page uni-events-page">
+		<div style={styles.page}>
+			<div style={styles.headerContainer}>
 				<PageHeader title="Events">
-					<>
-						<Form onSubmit={handleSubmit(searchHandler)}>
-							<FormControl
-								type="text"
-								placeholder="Search"
-								className="mr-sm-2"
-								{...register('search')}
-								onKeyDown={keyDownHandler}
-							/>
-						</Form>
-						<Button variant="primary" onClick={addNewHandler}>
-							Add New
-						</Button>
-						<Button
-							variant="primary"
-							onClick={removeHandler}
-							disabled={!(selectedEventList.length > 0)}
+					<div style={styles.headerActions}>
+						<Form
+							onSubmit={handleSubmit(searchHandler)}
+							style={styles.searchForm}
 						>
-							Remove
-						</Button>
-					</>
+							<div style={styles.searchInputContainer}>
+								<FiSearch style={styles.searchIcon} />
+								<Form.Control
+									type="text"
+									placeholder="Search events..."
+									{...register('search')}
+									onKeyDown={keyDownHandler}
+									style={styles.searchInput}
+								/>
+							</div>
+						</Form>
+						<div style={styles.actionButtons}>
+							<Button
+								variant="primary"
+								onClick={addNewHandler}
+								style={styles.actionButton}
+							>
+								<FiPlus style={{ fontSize: '16px' }} />
+								Add New
+							</Button>
+							<Button
+								variant="outline-danger"
+								onClick={removeHandler}
+								disabled={!selectedEventList.length}
+								style={styles.actionButton}
+							>
+								<FiTrash2 style={{ fontSize: '16px' }} />
+								Remove
+							</Button>
+						</div>
+					</div>
 				</PageHeader>
-				<div className="">
-					<CustomTable<EventItem>
-						tableHeaders={tableHeaders}
-						tableData={eventsTableList}
-						rowClickHandler={selectHandler}
-						selectedDataRows={selectedEventList}
-					/>
-				</div>
 			</div>
 
-			{/* TODO: Add New Event modal component */}
-			{/* <AddNewEvent
-        isAddNewModalOpen={isAddNewModalOpen}
-        modalCloseHandler={modalCloseHandler}
-        addNewConfirmHandler={addNewConfirmHandler}
-        isFormReset={createEventResponse ? true : false}
-      /> */}
+			<div style={styles.tableContainer}>
+				<CustomTable<EventItem>
+					tableHeaders={tableHeaders}
+					tableData={eventsTableList}
+					rowClickHandler={selectHandler}
+					selectedDataRows={selectedEventList}
+				/>
+			</div>
 
-			{/* Remove confirm modal */}
+			{/* Add New Event Modal */}
+			{/* <AddNewEvent
+				isAddNewModalOpen={isAddNewModalOpen}
+				modalCloseHandler={modalCloseHandler}
+				addNewConfirmHandler={addNewConfirmHandler}
+				isFormReset={!!createEventResponse}
+			/> */}
+
+			{/* Remove Event Confirmation Modal */}
 			<RemoveEvent
 				isRemoveModalOpen={isRemoveModalOpen}
 				modalCloseHandler={modalCloseHandler}
@@ -531,13 +307,20 @@ const AdminEvents = () => {
 				removeList={removeList}
 			/>
 
-			{/* Loader overlay */}
-			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-				<Modal.Body className="text-center">
-					<Spinner animation="border" role="status" />
+			{/* Loading Modal */}
+			<Modal
+				show={isLoading}
+				backdrop="static"
+				keyboard={false}
+				centered
+				style={styles.loadingModal}
+			>
+				<Modal.Body style={styles.loadingContent}>
+					<Spinner animation="border" role="status" variant="primary" />
+					<p style={styles.loadingText}>Loading events...</p>
 				</Modal.Body>
 			</Modal>
-		</>
+		</div>
 	)
 }
 

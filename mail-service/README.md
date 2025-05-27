@@ -21,7 +21,7 @@
     -   NODEMAILER_PASSWORD = app password for the account
 
 ```
-HOST=sltc.app.promentor.local
+HOST=nsbm.app.promentor.local
 PORT=8082
 SERVICE_NAME=pro-mentor-mail-service
 

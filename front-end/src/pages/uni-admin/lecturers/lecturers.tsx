@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Form, FormControl, Modal, Spinner } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PageHeader from '../../../components/shared/page-header/page-header'
 import CustomTable from '../../../components/shared/custom-table/custom-table'
 import { useEffect, useState } from 'react'
@@ -17,6 +16,7 @@ import {
 import { toast } from 'react-toastify'
 import { errorDisplayHandler } from '../../../utils/errorDisplayHandler'
 import { useForm } from 'react-hook-form'
+import { FiSearch, FiPlus, FiUserMinus } from 'react-icons/fi'
 
 type LecturerItem = {
 	id: string
@@ -40,7 +40,6 @@ const Lecturers = () => {
 		LecturerItem[]
 	>([])
 	const { register, handleSubmit } = useForm<{ search: string }>()
-
 	const {
 		setCreateLecturerRequest,
 		createLecturerResponse,
@@ -222,34 +221,133 @@ const Lecturers = () => {
 		isValidating_getLecturers,
 		isValidating_updateLecturer,
 	])
+	// Styles
+	const styles = {
+		page: {
+			padding: '24px',
+			backgroundColor: '#f8f9fa',
+			minHeight: 'calc(100vh - 56px)',
+		},
+		headerContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			marginBottom: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		headerActions: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '16px',
+			width: '100%',
+		},
+		searchForm: {
+			flexGrow: 1,
+		},
+		searchInputContainer: {
+			position: 'relative',
+			display: 'flex',
+			alignItems: 'center',
+		},
+		searchIcon: {
+			position: 'absolute',
+			left: '12px',
+			color: '#6c757d',
+		},
+		searchInput: {
+			paddingLeft: '40px',
+			borderRadius: '8px',
+			border: '1px solid #e9ecef',
+			height: '40px',
+			'&:focus': {
+				borderColor: '#6366f1',
+				boxShadow: '0 0 0 0.25rem rgba(99, 102, 241, 0.25)',
+			},
+		},
+		actionButtons: {
+			display: 'flex',
+			gap: '12px',
+		},
+		actionButton: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '8px',
+			padding: '8px 16px',
+			borderRadius: '8px',
+			fontWeight: '500',
+		},
+		tableContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		loadingModal: {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		loadingContent: {
+			background: 'rgba(255, 255, 255, 0.9)',
+			border: 'none',
+			padding: '32px',
+			borderRadius: '12px',
+			textAlign: 'center' as const,
+		},
+		loadingText: {
+			marginTop: '16px',
+			color: '#111827',
+			fontWeight: '500',
+		},
+	}
+
+	// ... (keep all existing hooks and logic exactly the same)
 
 	return (
 		<>
-			<div className="page uni-lecturer-page">
-				<PageHeader title="Lecturers">
-					<>
-						<Form onSubmit={handleSubmit(searchHandler)}>
-							<FormControl
-								type="text"
-								placeholder="Search"
-								className="mr-sm-2"
-								{...register('search')}
-								onKeyDown={keyDownHandler} // Listen for Enter key press
-							/>
-						</Form>
-						<Button variant="primary" onClick={addNewHandler}>
-							Add New
-						</Button>
-						<Button
-							variant="primary"
-							onClick={deactivateHandler}
-							disabled={!(selectedLecturerList.length > 0)}
-						>
-							Deactivate
-						</Button>
-					</>
-				</PageHeader>
-				<div className="">
+			<div style={styles.page}>
+				<div style={styles.headerContainer}>
+					<PageHeader title="Lecturers">
+						<div style={styles.headerActions}>
+							<Form
+								onSubmit={handleSubmit(searchHandler)}
+								style={styles.searchForm}
+							>
+								<div style={styles.searchInputContainer}>
+									<FiSearch style={styles.searchIcon} />
+									<Form.Control
+										type="text"
+										placeholder="Search lecturers..."
+										{...register('search')}
+										onKeyDown={keyDownHandler}
+										style={styles.searchInput}
+									/>
+								</div>
+							</Form>
+							<div style={styles.actionButtons}>
+								<Button
+									variant="primary"
+									onClick={addNewHandler}
+									style={styles.actionButton}
+								>
+									<FiPlus style={{ fontSize: '16px' }} />
+									Add New
+								</Button>
+								<Button
+									variant="outline-danger"
+									onClick={deactivateHandler}
+									disabled={!(selectedLecturerList.length > 0)}
+									style={styles.actionButton}
+								>
+									<FiUserMinus style={{ fontSize: '16px' }} />
+									Deactivate
+								</Button>
+							</div>
+						</div>
+					</PageHeader>
+				</div>
+
+				<div style={styles.tableContainer}>
 					<CustomTable<LecturerItem>
 						tableHeaders={tableHeaders}
 						tableData={lecturersTableList}
@@ -259,7 +357,7 @@ const Lecturers = () => {
 				</div>
 			</div>
 
-			{/* add new modal */}
+			{/* Modals */}
 			<AddNewLecturer
 				isAddNewModalOpen={isAddNewModalOpen}
 				modalCloseHandler={modalCloseHandler}
@@ -267,7 +365,6 @@ const Lecturers = () => {
 				isFormReset={createLecturerResponse ? true : false}
 			/>
 
-			{/* deactivate confirm modal */}
 			<DeactivateLecturer
 				isDeactivateModalOpen={isDeactivateModalOpen}
 				modalCloseHandler={modalCloseHandler}
@@ -275,11 +372,16 @@ const Lecturers = () => {
 				deactivateList={deactivateList}
 			/>
 
-			{/* Loader overlay */}
-			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-				<Modal.Body className="text-center">
-					<Spinner animation="border" role="status" />
-					{/* <p>{loaderMsg}</p> */}
+			<Modal
+				show={isLoading}
+				backdrop="static"
+				keyboard={false}
+				centered
+				style={styles.loadingModal}
+			>
+				<Modal.Body style={styles.loadingContent}>
+					<Spinner animation="border" role="status" variant="primary" />
+					<p style={styles.loadingText}>Loading lecturers data...</p>
 				</Modal.Body>
 			</Modal>
 		</>

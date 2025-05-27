@@ -53,8 +53,8 @@ const keycloakAuthMiddleware = async (req: Request, res: Response, next: NextFun
         let url = origin;
 
         if ((origin && origin.includes("pro-mentor.live")) || (referUrl && referUrl.includes("pro-mentor.live") )
-            || (origin && origin.includes("sltc-promentor")) || (referUrl && referUrl.includes("sltc-promentor"))) {
-            keyTenant = "sltc";
+            || (origin && origin.includes("nsbm-promentor")) || (referUrl && referUrl.includes("nsbm-promentor"))) {
+            keyTenant = "nsbm";
             keyclockIdpServerUrl = "http://keycloak-service:443"
         } else {
             // eslint-disable-next-line no-lonely-if
@@ -65,7 +65,7 @@ const keycloakAuthMiddleware = async (req: Request, res: Response, next: NextFun
                     return next(new UnauthorizeAccessException());
                 }
     
-                keyTenant = "sltc";
+                keyTenant = "nsbm";
                 keyclockIdpServerUrl = "http://keycloak-service:443";
             } else {
                 keyTenant = getTenantIdFromURL(url as string);

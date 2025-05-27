@@ -1,57 +1,25 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import PageHeader from '../../../../components/shared/page-header/page-header'
-import { Button, Form, Modal, Spinner } from 'react-bootstrap'
-import { FieldErrors, SubmitHandler, useForm } from 'react-hook-form'
+import { useState, useEffect } from 'react'
+import { useForm, SubmitHandler } from 'react-hook-form'
+import { Button, Card, Form, Spinner } from 'react-bootstrap'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useUploadPost } from '../../../../hooks/web/posts/useUploadPost'
-import { useEffect, useState } from 'react'
-import { errorDisplayHandler } from '../../../../utils/errorDisplayHandler'
-import './create-post.scss'
-import { useCreatePost } from '../../../../hooks/web/posts/useCreatePost'
-import { toast } from 'react-toastify'
 import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { motion } from 'framer-motion'
+import PageHeader from '../../../../components/shared/page-header/page-header'
+import { useUploadPost } from '../../../../hooks/web/posts/useUploadPost'
+import { useCreatePost } from '../../../../hooks/web/posts/useCreatePost'
 import { useGetPost } from '../../../../hooks/web/posts/useGetPost'
 import { useEditPost } from '../../../../hooks/web/posts/useEditPost'
+import { errorDisplayHandler } from '../../../../utils/errorDisplayHandler'
+import { FiUpload, FiEdit2, FiX } from 'react-icons/fi'
 
-// Define validation schema
-// const schema = yup.object().shape({
-// 	image: yup.mixed().test('required', 'Image is required', (value) => {
-// 		// Ensure value is a FileList and has at least one file
-// 		return value instanceof FileList && value.length > 0
-// 	}),
-// 	// image: yup.mixed().when('postId', {
-// 	// 	is: (postId: string | undefined) => !postId, // Only require image if postId does not exist
-// 	// 	then: yup.mixed().test('required', 'Image is required', (value) => {
-// 	// 		// Ensure value is a FileList and has at least one file
-// 	// 		return value instanceof FileList && value.length > 0
-// 	// 	}),
-// 	// }),
-// 	description: yup.string().required('Description is required'),
-// })
-
-// Define validation schema
-const baseSchema = yup.object().shape({
+const schema = yup.object().shape({
 	description: yup.string().required('Description is required'),
 })
 
-const imageRequiredSchema = yup.object().shape({
-	image: yup.mixed().test('required', 'Image is required', (value) => {
-		// Ensure value is a FileList and has at least one file
-		return value instanceof FileList && value.length > 0
-	}),
-})
-
-interface PostFormData {
-	image: FileList
+interface FormData {
 	description: string
-}
-
-interface PostFormErrors extends FieldErrors<PostFormData> {
-	image?: {
-		type: string
-		message: string
-	}
 }
 
 const CreatePost = () => {
@@ -62,25 +30,21 @@ const CreatePost = () => {
 		handleSubmit,
 		formState: { errors },
 		reset,
-		// errors,
-	} = useForm<PostFormData | { description: string }, PostFormErrors>({
-		// resolver: yupResolver(schema) as any,
-		resolver: yupResolver(
-			!postId ? baseSchema.concat(imageRequiredSchema) : baseSchema
-		),
+	} = useForm<FormData>({
+		resolver: yupResolver(schema),
 	})
+
 	const [isLoading, setIsLoading] = useState(false)
 	const [selectedImage, setSelectedImage] = useState<string | null>(null)
+	const [isDragging, setIsDragging] = useState(false)
+	const [isUploadingImage, setIsUploadingImage] = useState(false)
 
-	// Manually check if the 'image' field has an error
-	const hasImageError = 'image' in errors
-
+	// Hooks
 	const {
 		setUploadPostRequest,
 		setIsRequestReady_uploadPost,
 		uploadPostResponse,
 		isLoading_uploadPost,
-		isValidating_uploadPost,
 		error_uploadPost,
 	} = useUploadPost()
 	const {
@@ -88,35 +52,32 @@ const CreatePost = () => {
 		setIsRequestReady_createPost,
 		createPostResponse,
 		isLoading_createPost,
-		isValidating_createPost,
 		error_createPost,
 	} = useCreatePost()
 	const {
-		isLoading_getPost,
-		isValidating_getPost,
-		error_getPost,
 		getPostResponse,
 		setPostId_getPost,
 		mutate_getPost,
+		isLoading_getPost,
+		error_getPost,
 	} = useGetPost()
 	const {
-		isLoading_editPost,
-		isValidating_editPost,
-		error_editPost,
+		setPostId_editPost,
 		setIsRequestReady_editPost,
 		setEditPostRequest,
-		setPostId_editPost,
 		mutate_editPost,
 		editPostResponse,
+		isLoading_editPost,
+		error_editPost,
 	} = useEditPost()
 
-	const onSubmit: SubmitHandler<
-		PostFormData | { description: string }
-	> = async (data) => {
-		console.log(postId)
+	const onSubmit: SubmitHandler<FormData> = async (data) => {
+		if (!postId && !selectedImage) {
+			toast.error('Image is required')
+			return
+		}
 
 		if (postId) {
-			console.log(data)
 			setPostId_editPost(postId)
 			setEditPostRequest({
 				imageUrl: selectedImage || '',
@@ -136,27 +97,51 @@ const CreatePost = () => {
 	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
 		if (files && files.length > 0) {
-			const formData = new FormData()
-			formData.append('image', files[0])
-			setUploadPostRequest(formData)
-			setIsRequestReady_uploadPost(true)
+			uploadImage(files[0])
 		}
 	}
 
+	const uploadImage = (file: File) => {
+		setIsUploadingImage(true)
+		const formData = new FormData()
+		formData.append('image', file)
+		setUploadPostRequest(formData)
+		setIsRequestReady_uploadPost(true)
+	}
+
+	const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		setIsDragging(true)
+	}
+
+	const handleDragLeave = () => {
+		setIsDragging(false)
+	}
+
+	const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		setIsDragging(false)
+		const files = e.dataTransfer.files
+		if (files && files.length > 0) {
+			uploadImage(files[0])
+		}
+	}
+
+	const removeImage = () => {
+		setSelectedImage(null)
+	}
+
 	useEffect(() => {
-		console.log(postId)
 		if (postId) {
-			// get post details to edit
 			setPostId_getPost(postId)
 			mutate_getPost()
 		}
-	}, [])
+	}, [postId])
 
 	useEffect(() => {
 		if (getPostResponse) {
 			reset({
 				description: getPostResponse.description,
-				image: undefined,
 			})
 			setSelectedImage(getPostResponse.imageUrl)
 		}
@@ -165,13 +150,14 @@ const CreatePost = () => {
 	useEffect(() => {
 		if (uploadPostResponse) {
 			setSelectedImage(import.meta.env.VITE_CDN_URL + uploadPostResponse.path)
-			toast.success('Post image uploaded!')
+			setIsUploadingImage(false)
+			// toast.success('Image uploaded successfully!')
+			console.log('>>> Image uploaded successfully!')
 		}
 	}, [uploadPostResponse])
 
 	useEffect(() => {
 		if (createPostResponse) {
-			console.log(createPostResponse)
 			toast.success('Post created successfully!')
 			navigate('/')
 		}
@@ -179,8 +165,8 @@ const CreatePost = () => {
 
 	useEffect(() => {
 		if (editPostResponse) {
-			console.log(editPostResponse)
 			toast.success('Post updated successfully!')
+			navigate('/')
 		}
 	}, [editPostResponse])
 
@@ -194,13 +180,9 @@ const CreatePost = () => {
 	useEffect(() => {
 		if (
 			isLoading_uploadPost ||
-			isValidating_uploadPost ||
 			isLoading_createPost ||
-			isValidating_createPost ||
 			isLoading_getPost ||
-			isValidating_getPost ||
-			isLoading_editPost ||
-			isValidating_editPost
+			isLoading_editPost
 		) {
 			setIsLoading(true)
 		} else {
@@ -208,67 +190,263 @@ const CreatePost = () => {
 		}
 	}, [
 		isLoading_uploadPost,
-		isValidating_uploadPost,
 		isLoading_createPost,
-		isValidating_createPost,
 		isLoading_getPost,
-		isValidating_getPost,
 		isLoading_editPost,
-		isValidating_editPost,
 	])
 
 	return (
-		<>
-			<div className="page create-post-page">
-				<PageHeader title={postId ? 'Edit Post' : 'Create a Post'}></PageHeader>
-				<div className="cont">
-					<Form onSubmit={handleSubmit(onSubmit)} className="form">
-						{selectedImage !== null && (
-							<img
-								src={selectedImage}
-								alt="uploaded-image"
-								className="uploaded-image"
-							/>
-						)}
+		<div
+			style={{
+				backgroundColor: '#F8FAFC',
+				minHeight: '100vh',
+				padding: '24px',
+			}}
+		>
+			<div
+				style={{
+					maxWidth: '800px',
+					margin: '0 auto',
+				}}
+			>
+				<PageHeader
+					title={postId ? 'Edit Post' : 'Create New Post'}
+					subtitle={
+						postId
+							? 'Update your post content'
+							: 'Share your thoughts with the community'
+					}
+				/>
 
-						<Form.Group controlId="image">
-							<Form.Label>Image</Form.Label>
-							<Form.Control
-								type="file"
-								{...register('image')}
-								onChange={handleImageChange}
-							/>
-							{!postId && hasImageError && (
-								<Form.Text className="text-danger">
-									{errors?.image?.message}
-								</Form.Text>
-							)}
-						</Form.Group>
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.3 }}
+				>
+					<Card
+						style={{
+							border: '1px solid #F1F5F9',
+							borderRadius: '16px',
+							boxShadow: '0 4px 6px rgba(15, 23, 42, 0.03)',
+							overflow: 'hidden',
+						}}
+					>
+						<Card.Body style={{ padding: '32px' }}>
+							<Form onSubmit={handleSubmit(onSubmit)}>
+								{/* Image Upload Section */}
+								<Form.Group style={{ marginBottom: '24px' }}>
+									<Form.Label
+										style={{
+											display: 'block',
+											marginBottom: '12px',
+											fontWeight: '600',
+											color: '#1E293B',
+										}}
+									>
+										Post Image{' '}
+										{!postId && <span style={{ color: '#DC2626' }}>*</span>}
+									</Form.Label>
 
-						<Form.Group controlId="description">
-							<Form.Label>Description</Form.Label>
-							<Form.Control as="textarea" {...register('description')} />
-							{errors.description && (
-								<Form.Text className="text-danger">
-									{errors.description.message}
-								</Form.Text>
-							)}
-						</Form.Group>
+									{selectedImage ? (
+										<div
+											style={{
+												position: 'relative',
+												borderRadius: '12px',
+												overflow: 'hidden',
+												marginBottom: '16px',
+											}}
+										>
+											<img
+												src={selectedImage}
+												alt="Preview"
+												style={{
+													width: '100%',
+													maxHeight: '400px',
+													objectFit: 'cover',
+													borderRadius: '12px',
+													border: '1px solid #E2E8F0',
+												}}
+											/>
+											<button
+												onClick={removeImage}
+												style={{
+													position: 'absolute',
+													top: '12px',
+													right: '12px',
+													backgroundColor: 'rgba(15, 23, 42, 0.7)',
+													color: 'white',
+													border: 'none',
+													borderRadius: '50%',
+													width: '32px',
+													height: '32px',
+													display: 'flex',
+													alignItems: 'center',
+													justifyContent: 'center',
+													cursor: 'pointer',
+												}}
+											>
+												<FiX size={18} />
+											</button>
+										</div>
+									) : (
+										<>
+											<div
+												onDragOver={handleDragOver}
+												onDragLeave={handleDragLeave}
+												onDrop={handleDrop}
+												onClick={() =>
+													document.getElementById('image-upload')?.click()
+												}
+												style={{
+													border: `2px dashed ${
+														isDragging ? '#8B5CF6' : '#E2E8F0'
+													}`,
+													borderRadius: '12px',
+													padding: '32px',
+													textAlign: 'center',
+													backgroundColor: isDragging ? '#F5F3FF' : '#F8FAFC',
+													cursor: 'pointer',
+													transition: 'all 0.2s',
+												}}
+											>
+												{isUploadingImage ? (
+													<div
+														style={{
+															display: 'flex',
+															flexDirection: 'column',
+															alignItems: 'center',
+														}}
+													>
+														<Spinner animation="border" role="status" />
+														<p style={{ marginTop: '12px', color: '#64748B' }}>
+															Uploading image...
+														</p>
+													</div>
+												) : (
+													<>
+														<FiUpload
+															size={32}
+															color={isDragging ? '#8B5CF6' : '#94A3B8'}
+															style={{ marginBottom: '12px' }}
+														/>
+														<p
+															style={{
+																color: isDragging ? '#8B5CF6' : '#64748B',
+																marginBottom: '8px',
+																fontWeight: isDragging ? '600' : '500',
+															}}
+														>
+															{isDragging
+																? 'Drop your image here'
+																: 'Click to upload or drag and drop'}
+														</p>
+														<small style={{ color: '#94A3B8' }}>
+															JPEG, PNG (Max 5MB)
+														</small>
+													</>
+												)}
+											</div>
+											<Form.Control
+												type="file"
+												accept="image/*"
+												onChange={handleImageChange}
+												style={{ display: 'none' }}
+												id="image-upload"
+											/>
+										</>
+									)}
+								</Form.Group>
 
-						<Button variant="primary" type="submit">
-							{postId ? 'Save' : 'Submit'}
-						</Button>
-					</Form>
-				</div>
+								{/* Description Section */}
+								<Form.Group style={{ marginBottom: '32px' }}>
+									<Form.Label
+										style={{
+											display: 'block',
+											marginBottom: '12px',
+											fontWeight: '600',
+											color: '#1E293B',
+										}}
+									>
+										Description <span style={{ color: '#DC2626' }}>*</span>
+									</Form.Label>
+									<Form.Control
+										as="textarea"
+										rows={5}
+										{...register('description')}
+										style={{
+											border: errors.description
+												? '1px solid #DC2626'
+												: '1px solid #E2E8F0',
+											borderRadius: '12px',
+											padding: '16px',
+											resize: 'none',
+											':focus': {
+												borderColor: '#8B5CF6',
+												boxShadow: '0 0 0 0.25rem rgba(139, 92, 246, 0.25)',
+											},
+										}}
+										placeholder="What's on your mind?"
+										isInvalid={!!errors.description}
+									/>
+									{errors.description && (
+										<Form.Text className="text-danger">
+											{errors.description.message}
+										</Form.Text>
+									)}
+								</Form.Group>
+
+								{/* Submit Button */}
+								<div style={{ textAlign: 'right' }}>
+									<Button
+										type="submit"
+										disabled={isLoading || isUploadingImage}
+										style={{
+											background:
+												'linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%)',
+											border: 'none',
+											borderRadius: '12px',
+											padding: '12px 32px',
+											fontWeight: '600',
+											fontSize: '16px',
+											color: '#FFFFFF',
+											display: 'inline-flex',
+											alignItems: 'center',
+											gap: '8px',
+											boxShadow: '0 2px 4px rgba(139, 92, 246, 0.2)',
+											opacity: isLoading || isUploadingImage ? 0.7 : 1,
+										}}
+									>
+										{isLoading ? (
+											<>
+												<Spinner
+													as="span"
+													animation="border"
+													size="sm"
+													role="status"
+													aria-hidden="true"
+												/>
+												{postId ? 'Updating...' : 'Posting...'}
+											</>
+										) : (
+											<>
+												{postId ? (
+													<>
+														<FiEdit2 size={18} />
+														Update Post
+													</>
+												) : (
+													'Create Post'
+												)}
+											</>
+										)}
+									</Button>
+								</div>
+							</Form>
+						</Card.Body>
+					</Card>
+				</motion.div>
 			</div>
-			{/* Loader overlay */}
-			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-				<Modal.Body className="text-center">
-					<Spinner animation="border" role="status" />
-					{/* <p>{loaderMsg}</p> */}
-				</Modal.Body>
-			</Modal>
-		</>
+		</div>
 	)
 }
 

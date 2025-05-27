@@ -40,7 +40,7 @@ const mockdata = [
 	{
 		title: 'Explore Opportunities',
 		description:
-			'Find a wide range of job and internship opportunities specifically tailored for SLTC Research University students. Filter and search based on your field of study, location, and other criteria to find the perfect match for your career aspirations.',
+			'Find a wide range of job and internship opportunities specifically tailored for NSBM University students. Filter and search based on your field of study, location, and other criteria to find the perfect match for your career aspirations.',
 		icon: searchIcon,
 	},
 	{

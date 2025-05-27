@@ -77,7 +77,7 @@
               "impersonation",
               "view-events"
             ],
-            "sltc-realm": [
+            "nsbm-realm": [
               "query-users",
               "query-groups",
               "view-identity-providers",
@@ -373,7 +373,7 @@
         }
       ],
       "security-admin-console": [],
-      "sltc-realm": [
+      "nsbm-realm": [
         {
           "id": "2881ee20-3cb9-481a-8e1b-75eb8fd040d7",
           "name": "view-users",
@@ -381,7 +381,7 @@
           "composite": true,
           "composites": {
             "client": {
-              "sltc-realm": [
+              "nsbm-realm": [
                 "query-users",
                 "query-groups"
               ]
@@ -470,7 +470,7 @@
           "composite": true,
           "composites": {
             "client": {
-              "sltc-realm": [
+              "nsbm-realm": [
                 "query-clients"
               ]
             }
@@ -1411,8 +1411,8 @@
     },
     {
       "id": "62a226d4-08b4-495b-a431-3c4bb738037b",
-      "clientId": "sltc-realm",
-      "name": "sltc Realm",
+      "clientId": "nsbm-realm",
+      "name": "nsbm Realm",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,

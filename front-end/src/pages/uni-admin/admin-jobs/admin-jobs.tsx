@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Form, FormControl, Modal, Spinner } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import PageHeader from '../../../components/shared/page-header/page-header'
 import CustomTable from '../../../components/shared/custom-table/custom-table'
 import { useEffect, useState } from 'react'
@@ -10,7 +9,7 @@ import { toast } from 'react-toastify'
 import { errorDisplayHandler } from '../../../utils/errorDisplayHandler'
 import { useForm } from 'react-hook-form'
 import RemoveJob from '../../../components/uni-admin/admin-jobs/remove-job/remove-job'
-// import RemoveJob from '../../../components/uni-admin/admin-jobs/remove-job/remove-job'
+import { FiSearch, FiPlus, FiTrash2 } from 'react-icons/fi'
 
 type JobItem = {
 	id: string
@@ -45,6 +44,7 @@ const AdminJobs = () => {
 	const [selectedJobList, setSelectedJobList] = useState<JobItem[]>([])
 	const { register, handleSubmit } = useForm<{ search: string }>()
 
+	// Custom hooks
 	const {
 		setCreateJobRequest,
 		createJobResponse,
@@ -66,8 +66,89 @@ const AdminJobs = () => {
 		getJobsListResponse,
 	} = useGetJobList()
 
+	// Styles
+	const styles = {
+		page: {
+			padding: '24px',
+			backgroundColor: '#f8f9fa',
+			minHeight: 'calc(100vh - 56px)',
+		},
+		headerContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			marginBottom: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		headerActions: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '16px',
+			width: '100%',
+		},
+		searchForm: {
+			flexGrow: 1,
+		},
+		searchInputContainer: {
+			position: 'relative',
+			display: 'flex',
+			alignItems: 'center',
+		},
+		searchIcon: {
+			position: 'absolute',
+			left: '12px',
+			color: '#6c757d',
+		},
+		searchInput: {
+			paddingLeft: '40px',
+			borderRadius: '8px',
+			border: '1px solid #e9ecef',
+			height: '40px',
+			'&:focus': {
+				borderColor: '#6366f1',
+				boxShadow: '0 0 0 0.25rem rgba(99, 102, 241, 0.25)',
+			},
+		},
+		actionButtons: {
+			display: 'flex',
+			gap: '12px',
+		},
+		actionButton: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '8px',
+			padding: '8px 16px',
+			borderRadius: '8px',
+			fontWeight: '500',
+		},
+		tableContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		loadingModal: {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		loadingContent: {
+			background: 'rgba(255, 255, 255, 0.9)',
+			border: 'none',
+			padding: '32px',
+			borderRadius: '12px',
+			textAlign: 'center' as const,
+		},
+		loadingText: {
+			marginTop: '16px',
+			color: '#111827',
+			fontWeight: '500',
+		},
+	}
+
+	// Event handlers
 	const searchHandler = (data: { search: string }) => {
-		if (data.search !== null && data.search !== undefined) {
+		if (data.search) {
 			setSearch_getJobs(data.search)
 			mutate_getJobs()
 		}
@@ -77,32 +158,25 @@ const AdminJobs = () => {
 		if (event.key === 'Enter') handleSubmit(searchHandler)()
 	}
 
-	// open add new job modal
-	const addNewHandler = () => {
-		setIsAddNewModalOpen(true)
-	}
-
-	// open remove job modal
+	const addNewHandler = () => setIsAddNewModalOpen(true)
 	const removeHandler = () => {
-		removeListSetter(selectedJobList)
+		setRemoveList(
+			selectedJobList.map((job) => ({ id: job.id, name: job.title }))
+		)
 		setIsRemoveModalOpen(true)
 	}
 
-	// close both add and remove modals
 	const modalCloseHandler = () => {
 		setIsAddNewModalOpen(false)
 		setIsRemoveModalOpen(false)
 	}
 
-	// add new job confirmed
 	const addNewConfirmHandler = (data: JobCreateRequest) => {
 		setCreateJobRequest(data)
 		setIsRequestReady_createJob(true)
 	}
 
-	// remove job confirmed
 	const removeConfirmHandler = (list: { id: string; name: string }[]) => {
-		// TODO: Implement job removal logic
 		console.log('Jobs to remove:', list)
 		setIsRemoveModalOpen(false)
 		setSelectedJobList([])
@@ -110,21 +184,17 @@ const AdminJobs = () => {
 		mutate_getJobs()
 	}
 
-	// convert table row data into remove list data
-	const removeListSetter = (list: JobItem[]) => {
-		const rList = list.map((item) => {
-			return {
-				id: item.id,
-				name: item.title,
-			}
-		})
-		setRemoveList(rList)
+	const selectHandler = (item: JobItem) => {
+		setSelectedJobList((prev) =>
+			prev.some((job) => job.id === item.id)
+				? prev.filter((job) => job.id !== item.id)
+				: [...prev, item]
+		)
 	}
 
-	// convert jobs details response into table row data
 	const jobsTableDataSetter = (response: GetJobResponse[]) => {
-		const jobList: JobItem[] = response.map((item) => {
-			return {
+		setJobsTableList(
+			response.map((item) => ({
 				id: item.id,
 				title: item.title || '-',
 				description: item.description || '-',
@@ -133,24 +203,11 @@ const AdminJobs = () => {
 				type: item.type?.key || '-',
 				createdBy: item.createdBy || '',
 				companyName: item.companyName || '',
-			}
-		})
-		setJobsTableList(jobList)
+			}))
+		)
 	}
 
-	// select data row in the table
-	const selectHandler = (item: JobItem) => {
-		if (selectedJobList.some((selectedJob) => selectedJob.id === item.id)) {
-			// If already selected, remove from list
-			setSelectedJobList(
-				selectedJobList.filter((selectedJob) => selectedJob.id !== item.id)
-			)
-		} else {
-			// If not selected, add to list
-			setSelectedJobList([...selectedJobList, item])
-		}
-	}
-
+	// Effects
 	useEffect(() => {
 		mutate_getJobs()
 	}, [])
@@ -164,10 +221,8 @@ const AdminJobs = () => {
 	}, [createJobResponse])
 
 	useEffect(() => {
-		if (getJobsListResponse && getJobsListResponse.length > 0) {
+		if (getJobsListResponse) {
 			jobsTableDataSetter(getJobsListResponse)
-		} else if (getJobsListResponse && getJobsListResponse.length === 0) {
-			setJobsTableList([])
 		}
 	}, [getJobsListResponse])
 
@@ -177,16 +232,12 @@ const AdminJobs = () => {
 	}, [error_createJob, error_getJobs])
 
 	useEffect(() => {
-		if (
+		setIsLoading(
 			isLoading_createJob ||
-			isLoading_getJobs ||
-			isValidating_createJob ||
-			isValidating_getJobs
-		) {
-			setIsLoading(true)
-		} else {
-			setIsLoading(false)
-		}
+				isLoading_getJobs ||
+				isValidating_createJob ||
+				isValidating_getJobs
+		)
 	}, [
 		isLoading_createJob,
 		isLoading_getJobs,
@@ -195,39 +246,55 @@ const AdminJobs = () => {
 	])
 
 	return (
-		<>
-			<div className="page uni-jobs-page">
+		<div style={styles.page}>
+			<div style={styles.headerContainer}>
 				<PageHeader title="Jobs">
-					<>
-						<Form onSubmit={handleSubmit(searchHandler)}>
-							<FormControl
-								type="text"
-								placeholder="Search"
-								className="mr-sm-2"
-								{...register('search')}
-								onKeyDown={keyDownHandler}
-							/>
-						</Form>
-						<Button variant="primary" onClick={addNewHandler}>
-							Add New
-						</Button>
-						<Button
-							variant="primary"
-							onClick={removeHandler}
-							disabled={!(selectedJobList.length > 0)}
+					<div style={styles.headerActions}>
+						<Form
+							onSubmit={handleSubmit(searchHandler)}
+							style={styles.searchForm}
 						>
-							Remove
-						</Button>
-					</>
+							<div style={styles.searchInputContainer}>
+								<FiSearch style={styles.searchIcon} />
+								<Form.Control
+									type="text"
+									placeholder="Search jobs..."
+									{...register('search')}
+									onKeyDown={keyDownHandler}
+									style={styles.searchInput}
+								/>
+							</div>
+						</Form>
+						<div style={styles.actionButtons}>
+							<Button
+								variant="primary"
+								onClick={addNewHandler}
+								style={styles.actionButton}
+							>
+								<FiPlus style={{ fontSize: '16px' }} />
+								Add New
+							</Button>
+							<Button
+								variant="outline-danger"
+								onClick={removeHandler}
+								disabled={!selectedJobList.length}
+								style={styles.actionButton}
+							>
+								<FiTrash2 style={{ fontSize: '16px' }} />
+								Remove
+							</Button>
+						</div>
+					</div>
 				</PageHeader>
-				<div className="">
-					<CustomTable<JobItem>
-						tableHeaders={tableHeaders}
-						tableData={jobsTableList}
-						rowClickHandler={selectHandler}
-						selectedDataRows={selectedJobList}
-					/>
-				</div>
+			</div>
+
+			<div style={styles.tableContainer}>
+				<CustomTable<JobItem>
+					tableHeaders={tableHeaders}
+					tableData={jobsTableList}
+					rowClickHandler={selectHandler}
+					selectedDataRows={selectedJobList}
+				/>
 			</div>
 
 			{/* TODO: Add New Job modal component */}
@@ -235,10 +302,10 @@ const AdminJobs = () => {
         isAddNewModalOpen={isAddNewModalOpen}
         modalCloseHandler={modalCloseHandler}
         addNewConfirmHandler={addNewConfirmHandler}
-        isFormReset={createJobResponse ? true : false}
+        isFormReset={!!createJobResponse}
       /> */}
 
-			{/* Remove confirm modal */}
+			{/* Remove Job Confirmation Modal */}
 			<RemoveJob
 				isRemoveModalOpen={isRemoveModalOpen}
 				modalCloseHandler={modalCloseHandler}
@@ -246,13 +313,20 @@ const AdminJobs = () => {
 				removeList={removeList}
 			/>
 
-			{/* Loader overlay */}
-			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-				<Modal.Body className="text-center">
-					<Spinner animation="border" role="status" />
+			{/* Loading Modal */}
+			<Modal
+				show={isLoading}
+				backdrop="static"
+				keyboard={false}
+				centered
+				style={styles.loadingModal}
+			>
+				<Modal.Body style={styles.loadingContent}>
+					<Spinner animation="border" role="status" variant="primary" />
+					<p style={styles.loadingText}>Loading jobs...</p>
 				</Modal.Body>
 			</Modal>
-		</>
+		</div>
 	)
 }
 

@@ -111,7 +111,7 @@ export function Welcome() {
 						</Text>
 
 						<Text mt={30}>
-							At ProMentor, we are dedicated to empowering students of SLTC Research University to reach their full potential and thrive in their future careers.
+							At ProMentor, we are dedicated to empowering students of NSBM University to reach their full potential and thrive in their future careers.
 							<br /><br />
 							Our platform serves as a comprehensive professional development and career networking hub, connecting you with industry professionals, job and internship opportunities, industry events, and invaluable resources to help you excel in your chosen field.
 						</Text>

@@ -16,8 +16,8 @@ import { InvalidURLException } from "../errors/custom_exceptions/invalid-url-exc
 const getTenantIdFromURL = (url: string): string => {
     console.debug("reserved url: ", url);
 
-    if (url && (url.includes("pro-mentor.live") || url.includes("sltc-promentor"))) {
-        return "sltc";
+    if (url && (url.includes("pro-mentor.live") || url.includes("nsbm-promentor"))) {
+        return "nsbm";
     }
 
     try {
@@ -56,7 +56,7 @@ const getTenantIdFromURL = (url: string): string => {
 const getKeycloakIdpUrl = (url: string): string => {
     console.debug("reserved url: ", url);
 
-    if (url && (url.includes("pro-mentor.live") || url.includes("sltc-promentor"))) {
+    if (url && (url.includes("pro-mentor.live") || url.includes("nsbm-promentor"))) {
         return "http://keycloak-service:443";
     }
 

@@ -1,9 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Form, FormControl, Modal, Spinner } from 'react-bootstrap'
+import { Button, Form, Modal, Spinner } from 'react-bootstrap'
 import CustomTable from '../../../components/shared/custom-table/custom-table'
 import PageHeader from '../../../components/shared/page-header/page-header'
-import './uni-staff.scss'
-import { useGetStaffTableDetails } from '../../../hooks/uni-admin/staff/useGetStaffTableDetails'
 import { useEffect, useState } from 'react'
 import AddNewStaff, {
 	FormData,
@@ -18,6 +15,8 @@ import { GetResourceManagersResponse } from '@promentor-app/shared-lib'
 import { useUpdateStaff } from '../../../hooks/uni-admin/staff/useUpdateStaff'
 import { useGetStaffById } from '../../../hooks/uni-admin/staff/useGetStaffById'
 import { useForm } from 'react-hook-form'
+import { useGetStaffTableDetails } from '../../../hooks/uni-admin/staff/useGetStaffTableDetails'
+import { FiSearch, FiPlus, FiUserMinus, FiEdit } from 'react-icons/fi'
 
 type StaffItem = {
 	id: string
@@ -45,6 +44,7 @@ const UniStaff = () => {
 	)
 	const { register, handleSubmit } = useForm<{ search: string }>()
 
+	// Custom hooks
 	const {
 		setCreateStaffRequest,
 		createStaffResponse,
@@ -84,10 +84,85 @@ const UniStaff = () => {
 		mutate_updateStaff,
 	} = useUpdateStaff()
 
-	const searchHandler = (data: { search: string }) => {
-		console.log(data)
+	// Styles
+	const styles = {
+		page: {
+			padding: '24px',
+			backgroundColor: '#f8f9fa',
+			minHeight: 'calc(100vh - 56px)',
+		},
+		headerContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			marginBottom: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		headerActions: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '16px',
+			width: '100%',
+		},
+		searchForm: {
+			flexGrow: 1,
+		},
+		searchInputContainer: {
+			position: 'relative',
+			display: 'flex',
+			alignItems: 'center',
+		},
+		searchIcon: {
+			position: 'absolute',
+			left: '12px',
+			color: '#6c757d',
+		},
+		searchInput: {
+			paddingLeft: '40px',
+			borderRadius: '8px',
+			border: '1px solid #e9ecef',
+			height: '40px',
+		},
+		actionButtons: {
+			display: 'flex',
+			gap: '12px',
+		},
+		actionButton: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '8px',
+			padding: '8px 16px',
+			borderRadius: '8px',
+			fontWeight: '500',
+		},
+		tableContainer: {
+			background: 'white',
+			borderRadius: '12px',
+			padding: '24px',
+			boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+		},
+		loadingModal: {
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+		},
+		loadingContent: {
+			background: 'rgba(255, 255, 255, 0.9)',
+			border: 'none',
+			padding: '32px',
+			borderRadius: '12px',
+			textAlign: 'center' as const,
+		},
+		loadingText: {
+			marginTop: '16px',
+			color: '#111827',
+			fontWeight: '500',
+		},
+	}
 
-		if (data.search !== null && data.search !== undefined) {
+	// Event handlers
+	const searchHandler = (data: { search: string }) => {
+		if (data.search) {
 			setSearch_getStaff(data.search)
 			mutate_getStaff()
 		}
@@ -97,18 +172,18 @@ const UniStaff = () => {
 		if (event.key === 'Enter') handleSubmit(searchHandler)()
 	}
 
-	// open add new staff modal
-	const addNewHandler = () => {
-		setIsAddNewModalOpen(true)
-	}
-
-	// open deactivate staff modal
+	const addNewHandler = () => setIsAddNewModalOpen(true)
 	const deactivateHandler = () => {
-		deactivateListSetter(selectedStaffList)
+		setDeactivateStaffList(
+			selectedStaffList.map((staff) => ({
+				id: staff.id,
+				email: staff.email,
+				name: staff.name,
+			}))
+		)
 		setIsDeactivateModalOpen(true)
 	}
 
-	// close both add and deactivate modals
 	const modalCloseHandler = () => {
 		setIsAddNewModalOpen(false)
 		setIsDeactivateModalOpen(false)
@@ -117,19 +192,13 @@ const UniStaff = () => {
 		setEditStaffData(undefined)
 	}
 
-	// add new staff confirmed
 	const addNewConfirmHandler = (data: FormData) => {
-		// setIsLoading(true)
 		setCreateStaffRequest(data)
 		setIsRequestReady_createStaff(true)
-		// setIsAddNewModalOpen(false)
 	}
 
-	// deactivate staff confirmed
 	const deactivateConfirmHandler = (list: DeactivateItem[]) => {
-		// console.log(list)
 		setIsDeactivated(true)
-
 		list.forEach((item) => {
 			setStaffId(item.id)
 			setUpdateStaffRequest({
@@ -139,77 +208,48 @@ const UniStaff = () => {
 			setIsRequestReady_updateStaff(true)
 			mutate_updateStaff()
 		})
-
 		setIsDeactivateModalOpen(false)
 	}
 
-	// convert table row data into deactivate list data
-	const deactivateListSetter = (list: StaffItem[]) => {
-		const dList: DeactivateItem[] = list.map((item) => {
-			return {
-				id: item.id,
-				email: item.email,
-				name: item.name,
-			}
-		})
-		// console.log(staffList)
-
-		setDeactivateStaffList(dList)
-	}
-
-	// convert staff details response into table row data
-	const staffTableDataSetter = (response: GetResourceManagersResponse[]) => {
-		const staffList: StaffItem[] = response.map((item) => {
-			return {
-				id: item.id,
-				name: item?.firstName + ' ' + item?.lastName || '-',
-				username: item.username,
-				email: item.email,
-				status: item.enabled ? 'Active' : 'Inactive',
-			}
-		})
-		setStaffTableList(staffList)
-	}
-
-	// select data row in the table
 	const selectHandler = (item: StaffItem) => {
-		if (selectedStaffList.some((selectedUser) => selectedUser.id === item.id)) {
-			// If already selected, remove from list
-			setSelectedStaffList(
-				selectedStaffList.filter((selectedUser) => selectedUser.id !== item.id)
-			)
-		} else {
-			// If not selected, add to list
-			setSelectedStaffList([...selectedStaffList, item])
-		}
+		setSelectedStaffList((prev) =>
+			prev.some((staff) => staff.id === item.id)
+				? prev.filter((staff) => staff.id !== item.id)
+				: [...prev, item]
+		)
 	}
 
-	// edit button clicked, open edit modal
 	const editHandler = (item: StaffItem) => {
-		// console.log(item)
 		setStaffId(item.id)
-
-		// get staff details by id
 		setStaffById(item.id)
 		mutate_getStaffById()
 		setIsRequestReady_getStaffById(true)
 	}
 
-	// edit data
 	const editConfirmHandler = (data: FormData) => {
-		console.log(data)
 		setUpdateStaffRequest(data)
 		setIsRequestReady_updateStaff(true)
 		mutate_updateStaff()
-		// setIsRequestReady_getStaffById(false)
 	}
 
+	const staffTableDataSetter = (response: GetResourceManagersResponse[]) => {
+		setStaffTableList(
+			response.map((item) => ({
+				id: item.id,
+				name: `${item.firstName || ''} ${item.lastName || ''}`.trim() || '-',
+				username: item.username,
+				email: item.email,
+				status: item.enabled ? 'Active' : 'Inactive',
+			}))
+		)
+	}
+
+	// Effects
 	useEffect(() => {
 		mutate_getStaff()
 	}, [])
 
 	useEffect(() => {
-		// console.log(createStaffResponse)
 		if (createStaffResponse) {
 			toast.success('Staff created successfully.')
 			mutate_getStaff()
@@ -218,17 +258,13 @@ const UniStaff = () => {
 	}, [createStaffResponse])
 
 	useEffect(() => {
-		// console.log(getStaffResponse)
-		if (getStaffResponse && getStaffResponse.length > 0) {
+		if (getStaffResponse) {
 			staffTableDataSetter(getStaffResponse)
-		} else if (getStaffResponse && getStaffResponse.length === 0) {
-			setStaffTableList([])
 		}
 	}, [getStaffResponse])
 
 	useEffect(() => {
 		if (getStaffByIdResponse) {
-			// console.log(getStaffByIdResponse)
 			setEditStaffData({
 				username: getStaffByIdResponse.username,
 				firstName: getStaffByIdResponse.firstName || '',
@@ -256,7 +292,6 @@ const UniStaff = () => {
 				setDeactivateStaffList([])
 				setIsDeactivated(false)
 			}
-
 			mutate_getStaff()
 		}
 	}, [updateStaffResponse])
@@ -269,82 +304,90 @@ const UniStaff = () => {
 	}, [error_createStaff, error_getStaff, error_updateStaff, error_getStaffById])
 
 	useEffect(() => {
-		if (
+		setIsLoading(
 			isLoading_createStaff ||
-			isLoading_getStaff ||
-			isValidating_createStaff ||
-			isValidating_getStaff ||
-			isLoading_updateStaff ||
-			isValidating_updateStaff ||
-			isLoading_getStaffById ||
-			isValidating_getStaffById
-		) {
-			setIsLoading(true)
-		} else {
-			setIsLoading(false)
-		}
+				isLoading_getStaff ||
+				isLoading_updateStaff ||
+				isLoading_getStaffById ||
+				isValidating_createStaff ||
+				isValidating_getStaff ||
+				isValidating_updateStaff ||
+				isValidating_getStaffById
+		)
 	}, [
 		isLoading_createStaff,
 		isLoading_getStaff,
+		isLoading_updateStaff,
+		isLoading_getStaffById,
 		isValidating_createStaff,
 		isValidating_getStaff,
-		isLoading_updateStaff,
 		isValidating_updateStaff,
-		isLoading_getStaffById,
 		isValidating_getStaffById,
 	])
 
 	return (
-		<>
-			<div className="page uni-staff-page">
+		<div style={styles.page}>
+			<div style={styles.headerContainer}>
 				<PageHeader title="Staff">
-					<>
-						<Form onSubmit={handleSubmit(searchHandler)}>
-							<FormControl
-								type="text"
-								placeholder="Search"
-								className="mr-sm-2"
-								{...register('search')}
-								onKeyDown={keyDownHandler} // Listen for Enter key press
-							/>
-						</Form>
-						<Button variant="primary" onClick={addNewHandler}>
-							Add New
-						</Button>
-						<Button
-							variant="primary"
-							onClick={deactivateHandler}
-							disabled={!(selectedStaffList.length > 0)}
+					<div style={styles.headerActions}>
+						<Form
+							onSubmit={handleSubmit(searchHandler)}
+							style={styles.searchForm}
 						>
-							Deactivate
-						</Button>
-					</>
+							<div style={styles.searchInputContainer}>
+								<FiSearch style={styles.searchIcon} />
+								<Form.Control
+									type="text"
+									placeholder="Search staff..."
+									{...register('search')}
+									onKeyDown={keyDownHandler}
+									style={styles.searchInput}
+								/>
+							</div>
+						</Form>
+						<div style={styles.actionButtons}>
+							<Button
+								variant="primary"
+								onClick={addNewHandler}
+								style={styles.actionButton}
+							>
+								<FiPlus style={{ fontSize: '16px' }} />
+								Add New
+							</Button>
+							<Button
+								variant="outline-danger"
+								onClick={deactivateHandler}
+								disabled={!selectedStaffList.length}
+								style={styles.actionButton}
+							>
+								<FiUserMinus style={{ fontSize: '16px' }} />
+								Deactivate
+							</Button>
+						</div>
+					</div>
 				</PageHeader>
-				<div className=""></div>
-				<div className="">
-					{staffTableList && (
-						<CustomTable<StaffItem>
-							tableHeaders={tableHeaders}
-							tableData={staffTableList}
-							rowClickHandler={selectHandler}
-							selectedDataRows={selectedStaffList}
-							editClickHandler={editHandler}
-						/>
-					)}
-				</div>
 			</div>
 
-			{/* add new modal */}
-			{isAddNewModalOpen && (
-				<AddNewStaff
-					isAddNewModalOpen={isAddNewModalOpen}
-					modalCloseHandler={modalCloseHandler}
-					addNewConfirmHandler={addNewConfirmHandler}
+			<div style={styles.tableContainer}>
+				<CustomTable<StaffItem>
+					tableHeaders={tableHeaders}
+					tableData={staffTableList}
+					rowClickHandler={selectHandler}
+					selectedDataRows={selectedStaffList}
+					editClickHandler={editHandler}
 				/>
-			)}
+			</div>
 
-			{/* edit modal */}
-			{editStaffData?.username !== undefined && isEditModalOpen && (
+			{/* Add New Staff Modal */}
+			<AddNewStaff
+				isAddNewModalOpen={isAddNewModalOpen}
+				modalCloseHandler={modalCloseHandler}
+				addNewConfirmHandler={addNewConfirmHandler}
+				isFormReset={!!createStaffResponse}
+			/>
+
+			{/* Edit Staff Modal */}
+			{editStaffData && (
 				<AddNewStaff
 					isAddNewModalOpen={isEditModalOpen}
 					modalCloseHandler={modalCloseHandler}
@@ -353,7 +396,7 @@ const UniStaff = () => {
 				/>
 			)}
 
-			{/* deactivate confirm modal */}
+			{/* Deactivate Staff Modal */}
 			<DeactivateStaff
 				isDeactivateModalOpen={isDeactivateModalOpen}
 				modalCloseHandler={modalCloseHandler}
@@ -361,14 +404,20 @@ const UniStaff = () => {
 				deactivateStaffList={deactivateStaffList}
 			/>
 
-			{/* Loader overlay */}
-			<Modal show={isLoading} backdrop="static" keyboard={false} centered>
-				<Modal.Body className="text-center">
-					<Spinner animation="border" role="status" />
-					{/* <p>{loaderMsg}</p> */}
+			{/* Loading Modal */}
+			<Modal
+				show={isLoading}
+				backdrop="static"
+				keyboard={false}
+				centered
+				style={styles.loadingModal}
+			>
+				<Modal.Body style={styles.loadingContent}>
+					<Spinner animation="border" role="status" variant="primary" />
+					<p style={styles.loadingText}>Loading staff data...</p>
 				</Modal.Body>
 			</Modal>
-		</>
+		</div>
 	)
 }
 

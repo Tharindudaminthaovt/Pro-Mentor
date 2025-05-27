@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import '@/assets/styles/App.scss'
 import { Route, Routes } from 'react-router-dom'
 import { AuthGuard } from './AuthGuard'

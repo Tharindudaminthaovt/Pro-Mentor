@@ -18,7 +18,7 @@
 
 ```
 127.0.0.1 idp.promentor.local
-127.0.0.1 sltc.app.promentor.local
+127.0.0.1 nsbm.app.promentor.local
 127.0.0.1 pro-mentor-web.app.promentor.local
 127.0.0.1 pro-mentor.app.promentor.local
 ```
